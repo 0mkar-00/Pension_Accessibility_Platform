@@ -1,16 +1,26 @@
-# React + Vite
+# Pension Accessibility Platform
 
-This template provides a minimal setup to get React working in Vite with HMR and some ESLint rules.
+An accessibility-first web application that helps senior citizens understand, complete, and track government pension applications.
 
-Currently, two official plugins are available:
+## Key Features
 
-- [@vitejs/plugin-react](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react) uses [Oxc](https://oxc.rs)
-- [@vitejs/plugin-react-swc](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react-swc) uses [SWC](https://swc.rs/)
+- Simple step-by-step pension application
+- Regional language support
+- Large text, icons, and accessible interface
+- Explain This / Voice Guidance
+- Document assistance and verification
+- Trusted Helper Mode
+- Application progress and notifications
+- Pension payment history
 
-## React Compiler
+## Project Goal
 
-The React Compiler is not enabled on this template because of its impact on dev & build performances. To add it, see [this documentation](https://react.dev/learn/react-compiler/installation).
+To make digital government pension services easier, clearer, and more inclusive for senior citizens, especially users who face language, visual, or digital-literacy barriers.
 
-## Expanding the ESLint configuration
+## Technology
 
-If you are developing a production application, we recommend using TypeScript with type-aware lint rules enabled. Check out the [TS template](https://github.com/vitejs/vite/tree/main/packages/create-vite/template-react-ts) for information on how to integrate TypeScript and [`typescript-eslint`](https://typescript-eslint.io) in your project.
+- React
+- Vite
+- JavaScript
+- Tailwind CSS
+- GitHub
