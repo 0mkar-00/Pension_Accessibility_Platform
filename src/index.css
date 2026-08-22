@@ -109,3 +109,52 @@ code {
   padding: 4px 8px;
   background: var(--code-bg);
 }
+
+/* Accessibility integration */
+
+/* Text size */
+:root[data-font-size='normal'] {
+  font-size: 18px;
+}
+
+:root[data-font-size='large'] {
+  font-size: 21px;
+}
+
+:root[data-font-size='extra-large'] {
+  font-size: 24px;
+}
+
+/* High contrast */
+:root[data-high-contrast='true'] {
+  --text: #000000;
+  --text-h: #000000;
+  --bg: #ffffff;
+  --border: #000000;
+  --accent: #000000;
+  --accent-bg: #ffffff;
+  --accent-border: #000000;
+}
+
+:root[data-high-contrast='true'] body {
+  background: #ffffff;
+  color: #000000;
+}
+
+:root[data-high-contrast='true'] button,
+:root[data-high-contrast='true'] input,
+:root[data-high-contrast='true'] select,
+:root[data-high-contrast='true'] textarea {
+  border-color: #000000;
+  color: #000000;
+}
+
+/* Reduced motion */
+:root[data-reduced-motion='true'] *,
+:root[data-reduced-motion='true'] *::before,
+:root[data-reduced-motion='true'] *::after {
+  animation-duration: 0.01ms !important;
+  animation-iteration-count: 1 !important;
+  transition-duration: 0.01ms !important;
+  scroll-behavior: auto !important;
+}
