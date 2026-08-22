@@ -1,6 +1,7 @@
 /**
  * Pension Provider
- * Manages global pension application state, active tracking status, document uploads, and payment history.
+ * Manages global pension application state, active tracking status, document uploads,
+ * verification status, notifications, and payment history.
  */
 
 import { useState, useEffect, useCallback } from 'react';
@@ -133,22 +134,15 @@ export const PensionProvider = ({ children }) => {
         currentUser
       );
 
+      const updatedApp = await pensionService.getApplicationById(applicationId);
+
       setApplications((prev) =>
-        prev.map((app) => {
-          if (app.id !== applicationId) return app;
-          const docs = (app.documents || []).map((d) =>
-            d.id === documentId ? updatedDoc : d
-          );
-          return { ...app, documents: docs, lastUpdatedDate: new Date().toISOString() };
-        })
+        prev.map((app) => (app.id === applicationId ? updatedApp : app))
       );
 
       setActiveApplication((prev) => {
         if (!prev || prev.id !== applicationId) return prev;
-        const docs = (prev.documents || []).map((d) =>
-          d.id === documentId ? updatedDoc : d
-        );
-        return { ...prev, documents: docs, lastUpdatedDate: new Date().toISOString() };
+        return updatedApp;
       });
 
       return updatedDoc;
@@ -172,22 +166,15 @@ export const PensionProvider = ({ children }) => {
         reviewRemarks
       );
 
+      const updatedApp = await pensionService.getApplicationById(applicationId);
+
       setApplications((prev) =>
-        prev.map((app) => {
-          if (app.id !== applicationId) return app;
-          const docs = (app.documents || []).map((d) =>
-            d.id === documentId ? updatedDoc : d
-          );
-          return { ...app, documents: docs, lastUpdatedDate: new Date().toISOString() };
-        })
+        prev.map((app) => (app.id === applicationId ? updatedApp : app))
       );
 
       setActiveApplication((prev) => {
         if (!prev || prev.id !== applicationId) return prev;
-        const docs = (prev.documents || []).map((d) =>
-          d.id === documentId ? updatedDoc : d
-        );
-        return { ...prev, documents: docs, lastUpdatedDate: new Date().toISOString() };
+        return updatedApp;
       });
 
       return updatedDoc;
@@ -197,6 +184,172 @@ export const PensionProvider = ({ children }) => {
       throw err;
     } finally {
       setIsLoading(false);
+    }
+  };
+
+  const getVerification = async (applicationId) => {
+    try {
+      return await pensionService.getVerification(applicationId);
+    } catch (err) {
+      console.error('PensionProvider: Error getting verification', err);
+      return null;
+    }
+  };
+
+  const updateVerificationCheck = async (
+    applicationId,
+    checkId,
+    status,
+    remarks = '',
+    nextAction = null
+  ) => {
+    try {
+      setIsLoading(true);
+      setError(null);
+      const updatedVerification = await pensionService.updateVerificationCheckStatus(
+        applicationId,
+        checkId,
+        status,
+        remarks,
+        nextAction,
+        currentUser
+      );
+
+      setApplications((prev) =>
+        prev.map((app) => {
+          if (app.id !== applicationId) return app;
+          return {
+            ...app,
+            verification: updatedVerification,
+            lastUpdatedDate: new Date().toISOString(),
+          };
+        })
+      );
+
+      setActiveApplication((prev) => {
+        if (!prev || prev.id !== applicationId) return prev;
+        return {
+          ...prev,
+          verification: updatedVerification,
+          lastUpdatedDate: new Date().toISOString(),
+        };
+      });
+
+      return updatedVerification;
+    } catch (err) {
+      console.error('PensionProvider: Update verification check error', err);
+      setError(err.message || 'Failed to update verification check.');
+      throw err;
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
+  const updateOverallVerification = async (
+    applicationId,
+    status,
+    remarks = '',
+    nextAction = null
+  ) => {
+    try {
+      setIsLoading(true);
+      setError(null);
+      const updatedVerification = await pensionService.updateOverallVerification(
+        applicationId,
+        status,
+        remarks,
+        nextAction,
+        currentUser
+      );
+
+      setApplications((prev) =>
+        prev.map((app) => {
+          if (app.id !== applicationId) return app;
+          return {
+            ...app,
+            verification: updatedVerification,
+            lastUpdatedDate: new Date().toISOString(),
+          };
+        })
+      );
+
+      setActiveApplication((prev) => {
+        if (!prev || prev.id !== applicationId) return prev;
+        return {
+          ...prev,
+          verification: updatedVerification,
+          lastUpdatedDate: new Date().toISOString(),
+        };
+      });
+
+      return updatedVerification;
+    } catch (err) {
+      console.error('PensionProvider: Update overall verification error', err);
+      setError(err.message || 'Failed to update overall verification.');
+      throw err;
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
+  const getNotifications = async (applicationId) => {
+    try {
+      return await pensionService.getNotifications(applicationId);
+    } catch (err) {
+      console.error('PensionProvider: Error fetching notifications', err);
+      return [];
+    }
+  };
+
+  const markNotificationRead = async (applicationId, notificationId) => {
+    try {
+      const updatedNotif = await pensionService.markNotificationRead(applicationId, notificationId);
+
+      setApplications((prev) =>
+        prev.map((app) => {
+          if (app.id !== applicationId) return app;
+          const notifs = (app.notifications || []).map((n) =>
+            n.id === notificationId ? updatedNotif : n
+          );
+          return { ...app, notifications: notifs };
+        })
+      );
+
+      setActiveApplication((prev) => {
+        if (!prev || prev.id !== applicationId) return prev;
+        const notifs = (prev.notifications || []).map((n) =>
+          n.id === notificationId ? updatedNotif : n
+        );
+        return { ...prev, notifications: notifs };
+      });
+
+      return updatedNotif;
+    } catch (err) {
+      console.error('PensionProvider: Error marking notification read', err);
+      throw err;
+    }
+  };
+
+  const markAllNotificationsRead = async (applicationId) => {
+    try {
+      const updatedNotifs = await pensionService.markAllNotificationsRead(applicationId);
+
+      setApplications((prev) =>
+        prev.map((app) => {
+          if (app.id !== applicationId) return app;
+          return { ...app, notifications: updatedNotifs };
+        })
+      );
+
+      setActiveApplication((prev) => {
+        if (!prev || prev.id !== applicationId) return prev;
+        return { ...prev, notifications: updatedNotifs };
+      });
+
+      return updatedNotifs;
+    } catch (err) {
+      console.error('PensionProvider: Error marking all notifications read', err);
+      throw err;
     }
   };
 
@@ -242,6 +395,12 @@ export const PensionProvider = ({ children }) => {
     submitApplication,
     uploadDocument,
     updateDocumentReview,
+    getVerification,
+    updateVerificationCheck,
+    updateOverallVerification,
+    getNotifications,
+    markNotificationRead,
+    markAllNotificationsRead,
     updateStatus,
     clearActiveApplication,
   };

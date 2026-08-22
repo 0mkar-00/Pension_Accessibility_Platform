@@ -102,6 +102,73 @@ export const DOCUMENT_TYPES = {
   },
 };
 
+export const VERIFICATION_STATUS = {
+  PENDING: 'PENDING',
+  IN_REVIEW: 'IN_REVIEW',
+  VERIFIED: 'VERIFIED',
+  ACTION_REQUIRED: 'ACTION_REQUIRED',
+  REJECTED: 'REJECTED',
+};
+
+export const VERIFICATION_STATUS_LABELS = {
+  [VERIFICATION_STATUS.PENDING]: 'Verification Pending',
+  [VERIFICATION_STATUS.IN_REVIEW]: 'Verification in Progress',
+  [VERIFICATION_STATUS.VERIFIED]: 'Fully Verified & Cleared',
+  [VERIFICATION_STATUS.ACTION_REQUIRED]: 'Action Required from Applicant',
+  [VERIFICATION_STATUS.REJECTED]: 'Verification Rejected',
+};
+
+export const VERIFICATION_CHECK_CATEGORIES = {
+  IDENTITY: {
+    id: 'CAT_IDENTITY',
+    title: 'Identity & Demographic Check',
+    description: 'Verification of applicant details against demographic registry records.',
+  },
+  DOCUMENT_SCRUTINY: {
+    id: 'CAT_DOCUMENTS',
+    title: 'Document Authenticity & Scrutiny',
+    description: 'Desk officer evaluation of uploaded certificates, age proof, and declarations.',
+  },
+  ELIGIBILITY: {
+    id: 'CAT_ELIGIBILITY',
+    title: 'Scheme Eligibility & Criteria Check',
+    description: 'Confirmation that applicant meets statutory age, income ceiling, and scheme criteria.',
+  },
+  BANK_DBT: {
+    id: 'CAT_BANK_DBT',
+    title: 'Bank Account & DBT Mandate Check',
+    description: 'Validation of bank account active status, IFSC code, and Direct Benefit Transfer readiness.',
+  },
+  MEDICAL_DISABILITY: {
+    id: 'CAT_MEDICAL',
+    title: 'Medical Disability Assessment',
+    description: 'Scrutiny of certified medical disability percentage from registered health board.',
+  },
+};
+
+export const NOTIFICATION_TYPES = {
+  ACTION_REQUIRED: {
+    id: 'ACTION_REQUIRED',
+    label: 'Action Needed',
+    icon: '⚠',
+  },
+  SUCCESS: {
+    id: 'SUCCESS',
+    label: 'Update / Approved',
+    icon: '✓',
+  },
+  INFO: {
+    id: 'INFO',
+    label: 'Information',
+    icon: 'ℹ️',
+  },
+  WARNING: {
+    id: 'WARNING',
+    label: 'Notice',
+    icon: '⚠️',
+  },
+};
+
 export const USER_ROLES = {
   PENSIONER: 'PENSIONER',
   TRUSTED_HELPER: 'TRUSTED_HELPER',
@@ -136,44 +203,7 @@ export const STORAGE_KEYS = {
   CURRENT_USER: 'pension_app_current_user',
   APPLICATIONS: 'pension_app_applications',
   PAYMENTS: 'pension_app_payments',
+  NOTIFICATIONS: 'pension_app_notifications',
   USER_PREFERENCES: 'pension_app_preferences',
-  
-};
-export const VERIFICATION_STATUS = {
-  PENDING: 'PENDING',
-  IN_REVIEW: 'IN_REVIEW',
-  VERIFIED: 'VERIFIED',
-  ACTION_REQUIRED: 'ACTION_REQUIRED',
-  REJECTED: 'REJECTED',
 };
 
-export const VERIFICATION_STATUS_LABELS = {
-  [VERIFICATION_STATUS.PENDING]: 'Verification Pending',
-  [VERIFICATION_STATUS.IN_REVIEW]: 'Verification in Progress',
-  [VERIFICATION_STATUS.VERIFIED]: 'Fully Verified & Cleared',
-  [VERIFICATION_STATUS.ACTION_REQUIRED]: 'Action Required from Applicant',
-  [VERIFICATION_STATUS.REJECTED]: 'Verification Rejected',
-};
-
-export const NOTIFICATION_TYPES = {
-  ACTION_REQUIRED: {
-    id: 'ACTION_REQUIRED',
-    label: 'Action Needed',
-    icon: '⚠',
-  },
-  SUCCESS: {
-    id: 'SUCCESS',
-    label: 'Update / Approved',
-    icon: '✓',
-  },
-  INFO: {
-    id: 'INFO',
-    label: 'Information',
-    icon: 'ℹ️',
-  },
-  WARNING: {
-    id: 'WARNING',
-    label: 'Notice',
-    icon: '⚠️',
-  },
-};
