@@ -1,7 +1,7 @@
 /**
  * Pension Service
  * Handles CRUD operations, state persistence, application tracking, document uploads,
- * verification workflows, and payment history.
+ * verification workflows, notification management, and payment history.
  * Simulates async backend API with client-side storage fallback.
  */
 
@@ -18,6 +18,7 @@ import {
   DOCUMENT_TYPES,
   VERIFICATION_STATUS,
   VERIFICATION_CHECK_CATEGORIES,
+  NOTIFICATION_TYPES,
 } from '../utils/constants.js';
 import { validatePensionApplication } from '../utils/validators.js';
 
@@ -30,13 +31,14 @@ class PensionService {
 
   initData() {
     const existingApps = storageService.getItem(STORAGE_KEYS.APPLICATIONS);
-    // If empty or missing documents / verification array in mock apps, reseed
+    // If empty or missing documents / verification / notifications array in mock apps, reseed
     if (
       !existingApps ||
       !Array.isArray(existingApps) ||
       existingApps.length === 0 ||
       !existingApps[0]?.documents ||
-      !existingApps[0]?.verification
+      !existingApps[0]?.verification ||
+      !existingApps[0]?.notifications
     ) {
       storageService.setItem(STORAGE_KEYS.APPLICATIONS, MOCK_PENSION_APPLICATIONS);
     }
@@ -265,6 +267,22 @@ class PensionService {
       ],
     };
 
+    const initialNotifications = [
+      {
+        id: `NOTIF-${randomSuffix}-01`,
+        applicationId: newId,
+        type: NOTIFICATION_TYPES.INFO.id,
+        title: 'Application Submitted Successfully',
+        message: `Your pension application for ${scheme ? scheme.name : 'Pension'} has been submitted.`,
+        meaning: 'Your application is registered. Please upload any remaining documents.',
+        timestamp: new Date().toISOString(),
+        read: false,
+        actionRequired: false,
+        actionLabel: null,
+        targetFeature: 'application-status',
+      },
+    ];
+
     const newApplication = {
       id: newId,
       trackingNumber: newId,
@@ -296,6 +314,7 @@ class PensionService {
       },
       documents: initialDocuments,
       verification: initialVerification,
+      notifications: initialNotifications,
       timeline: [
         {
           step: 1,
@@ -470,12 +489,6 @@ class PensionService {
 
   /**
    * Update an individual verification check status
-   * @param {string} applicationId
-   * @param {string} checkId
-   * @param {string} status (VERIFICATION_STATUS)
-   * @param {string} remarks
-   * @param {string|null} nextAction
-   * @param {Object} currentUser
    */
   async updateVerificationCheckStatus(
     applicationId,
@@ -646,6 +659,72 @@ class PensionService {
     apps[index] = app;
     storageService.setItem(STORAGE_KEYS.APPLICATIONS, apps);
     return app;
+  }
+
+  /**
+   * Get notifications for an application
+   */
+  async getNotifications(applicationId) {
+    await delay(150);
+    const app = await this.getApplicationById(applicationId);
+    return app ? app.notifications || [] : [];
+  }
+
+  /**
+   * Mark a single notification as read
+   */
+  async markNotificationRead(applicationId, notificationId) {
+    await delay(150);
+
+    const apps = storageService.getItem(STORAGE_KEYS.APPLICATIONS, MOCK_PENSION_APPLICATIONS);
+    const appIndex = apps.findIndex((a) => a.id === applicationId);
+
+    if (appIndex === -1) {
+      throw new Error(`Application ${applicationId} not found.`);
+    }
+
+    const app = { ...apps[appIndex] };
+    const notifications = Array.isArray(app.notifications) ? [...app.notifications] : [];
+    const notifIndex = notifications.findIndex((n) => n.id === notificationId);
+
+    if (notifIndex === -1) {
+      throw new Error(`Notification ${notificationId} not found.`);
+    }
+
+    notifications[notifIndex] = {
+      ...notifications[notifIndex],
+      read: true,
+    };
+
+    app.notifications = notifications;
+    apps[appIndex] = app;
+    storageService.setItem(STORAGE_KEYS.APPLICATIONS, apps);
+    return notifications[notifIndex];
+  }
+
+  /**
+   * Mark all notifications as read for an application
+   */
+  async markAllNotificationsRead(applicationId) {
+    await delay(150);
+
+    const apps = storageService.getItem(STORAGE_KEYS.APPLICATIONS, MOCK_PENSION_APPLICATIONS);
+    const appIndex = apps.findIndex((a) => a.id === applicationId);
+
+    if (appIndex === -1) {
+      throw new Error(`Application ${applicationId} not found.`);
+    }
+
+    const app = { ...apps[appIndex] };
+    const notifications = (app.notifications || []).map((n) => ({
+      ...n,
+      read: true,
+    }));
+
+    app.notifications = notifications;
+    apps[appIndex] = app;
+    storageService.setItem(STORAGE_KEYS.APPLICATIONS, apps);
+    return notifications;
   }
 
   /**

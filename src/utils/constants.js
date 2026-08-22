@@ -146,6 +146,29 @@ export const VERIFICATION_CHECK_CATEGORIES = {
   },
 };
 
+export const NOTIFICATION_TYPES = {
+  ACTION_REQUIRED: {
+    id: 'ACTION_REQUIRED',
+    label: 'Action Needed',
+    icon: '⚠',
+  },
+  SUCCESS: {
+    id: 'SUCCESS',
+    label: 'Update / Approved',
+    icon: '✓',
+  },
+  INFO: {
+    id: 'INFO',
+    label: 'Information',
+    icon: 'ℹ️',
+  },
+  WARNING: {
+    id: 'WARNING',
+    label: 'Notice',
+    icon: '⚠️',
+  },
+};
+
 export const USER_ROLES = {
   PENSIONER: 'PENSIONER',
   TRUSTED_HELPER: 'TRUSTED_HELPER',
@@ -180,5 +203,7 @@ export const STORAGE_KEYS = {
   CURRENT_USER: 'pension_app_current_user',
   APPLICATIONS: 'pension_app_applications',
   PAYMENTS: 'pension_app_payments',
+  NOTIFICATIONS: 'pension_app_notifications',
   USER_PREFERENCES: 'pension_app_preferences',
 };
+

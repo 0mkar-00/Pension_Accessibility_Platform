@@ -1,7 +1,7 @@
 /**
  * Pension Provider
  * Manages global pension application state, active tracking status, document uploads,
- * verification status, and payment history.
+ * verification status, notifications, and payment history.
  */
 
 import { useState, useEffect, useCallback } from 'react';
@@ -134,7 +134,6 @@ export const PensionProvider = ({ children }) => {
         currentUser
       );
 
-      // Refresh verification as well if present
       const updatedApp = await pensionService.getApplicationById(applicationId);
 
       setApplications((prev) =>
@@ -293,6 +292,67 @@ export const PensionProvider = ({ children }) => {
     }
   };
 
+  const getNotifications = async (applicationId) => {
+    try {
+      return await pensionService.getNotifications(applicationId);
+    } catch (err) {
+      console.error('PensionProvider: Error fetching notifications', err);
+      return [];
+    }
+  };
+
+  const markNotificationRead = async (applicationId, notificationId) => {
+    try {
+      const updatedNotif = await pensionService.markNotificationRead(applicationId, notificationId);
+
+      setApplications((prev) =>
+        prev.map((app) => {
+          if (app.id !== applicationId) return app;
+          const notifs = (app.notifications || []).map((n) =>
+            n.id === notificationId ? updatedNotif : n
+          );
+          return { ...app, notifications: notifs };
+        })
+      );
+
+      setActiveApplication((prev) => {
+        if (!prev || prev.id !== applicationId) return prev;
+        const notifs = (prev.notifications || []).map((n) =>
+          n.id === notificationId ? updatedNotif : n
+        );
+        return { ...prev, notifications: notifs };
+      });
+
+      return updatedNotif;
+    } catch (err) {
+      console.error('PensionProvider: Error marking notification read', err);
+      throw err;
+    }
+  };
+
+  const markAllNotificationsRead = async (applicationId) => {
+    try {
+      const updatedNotifs = await pensionService.markAllNotificationsRead(applicationId);
+
+      setApplications((prev) =>
+        prev.map((app) => {
+          if (app.id !== applicationId) return app;
+          return { ...app, notifications: updatedNotifs };
+        })
+      );
+
+      setActiveApplication((prev) => {
+        if (!prev || prev.id !== applicationId) return prev;
+        return { ...prev, notifications: updatedNotifs };
+      });
+
+      return updatedNotifs;
+    } catch (err) {
+      console.error('PensionProvider: Error marking all notifications read', err);
+      throw err;
+    }
+  };
+
   const updateStatus = async (applicationId, newStatus, note = '') => {
     try {
       setIsLoading(true);
@@ -338,6 +398,9 @@ export const PensionProvider = ({ children }) => {
     getVerification,
     updateVerificationCheck,
     updateOverallVerification,
+    getNotifications,
+    markNotificationRead,
+    markAllNotificationsRead,
     updateStatus,
     clearActiveApplication,
   };

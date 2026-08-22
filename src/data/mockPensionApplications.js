@@ -1,6 +1,7 @@
 /**
  * Mock Pension Applications Dataset
- * Contains sample pension application lifecycles, tracking milestones, documents, and verification records.
+ * Contains sample pension application lifecycles, tracking milestones, documents,
+ * verification records, and notification alerts.
  * All records are fictional and intended for frontend logic simulation.
  */
 
@@ -12,6 +13,7 @@ import {
   DOCUMENT_TYPES,
   VERIFICATION_STATUS,
   VERIFICATION_CHECK_CATEGORIES,
+  NOTIFICATION_TYPES,
 } from '../utils/constants.js';
 
 export const MOCK_PENSION_APPLICATIONS = [
@@ -189,6 +191,47 @@ export const MOCK_PENSION_APPLICATIONS = [
         },
       ],
     },
+    notifications: [
+      {
+        id: 'NOTIF-8812-01',
+        applicationId: 'PEN-2026-8812',
+        type: NOTIFICATION_TYPES.SUCCESS.id,
+        title: 'Monthly Pension Payment Released',
+        message: 'Your monthly pension of ₹2,500 for July 2026 has been transferred to your registered bank account.',
+        meaning: 'The payment was successfully credited via Direct Benefit Transfer (DBT). No action is needed.',
+        timestamp: '2026-07-05T09:00:00Z',
+        read: false,
+        actionRequired: false,
+        actionLabel: null,
+        targetFeature: 'application-status',
+      },
+      {
+        id: 'NOTIF-8812-02',
+        applicationId: 'PEN-2026-8812',
+        type: NOTIFICATION_TYPES.SUCCESS.id,
+        title: 'Pension Sanction Approved',
+        message: 'Sanction Order #SO-MYS-2026-8812 has been signed and issued by the District Social Security Officer.',
+        meaning: 'Your pension application has completed all government approvals.',
+        timestamp: '2026-04-20T14:15:00Z',
+        read: true,
+        actionRequired: false,
+        actionLabel: null,
+        targetFeature: 'application-status',
+      },
+      {
+        id: 'NOTIF-8812-03',
+        applicationId: 'PEN-2026-8812',
+        type: NOTIFICATION_TYPES.INFO.id,
+        title: 'Verification Checks Completed',
+        message: 'Identity, document scrutiny, and field residency checks have all passed successfully.',
+        meaning: 'All preliminary verification stages are complete.',
+        timestamp: '2026-03-25T11:20:00Z',
+        read: true,
+        actionRequired: false,
+        actionLabel: null,
+        targetFeature: 'verification',
+      },
+    ],
     timeline: [
       {
         step: 1,
@@ -393,6 +436,47 @@ export const MOCK_PENSION_APPLICATIONS = [
         },
       ],
     },
+    notifications: [
+      {
+        id: 'NOTIF-9401-01',
+        applicationId: 'PEN-2026-9401',
+        type: NOTIFICATION_TYPES.ACTION_REQUIRED.id,
+        title: 'Action Needed: Income Certificate Re-upload',
+        message: 'Your uploaded Income Certificate was blurred and the official seal could not be read.',
+        meaning: 'Verification is temporarily paused until you upload a clear scanned copy of your Tahsildar-issued certificate.',
+        timestamp: '2026-07-28T15:30:00Z',
+        read: false,
+        actionRequired: true,
+        actionLabel: 'Go to Documents to Re-upload',
+        targetFeature: 'documents',
+      },
+      {
+        id: 'NOTIF-9401-02',
+        applicationId: 'PEN-2026-9401',
+        type: NOTIFICATION_TYPES.SUCCESS.id,
+        title: 'Spouse Death Certificate Verified',
+        message: 'Spouse demise record cross-referenced and approved against civil registration.',
+        meaning: 'Your marital status verification has been confirmed.',
+        timestamp: '2026-07-28T14:30:00Z',
+        read: true,
+        actionRequired: false,
+        actionLabel: null,
+        targetFeature: 'verification',
+      },
+      {
+        id: 'NOTIF-9401-03',
+        applicationId: 'PEN-2026-9401',
+        type: NOTIFICATION_TYPES.INFO.id,
+        title: 'Application Received by Mandya Circle',
+        message: 'Your online Widow Pension Scheme application has been assigned to the desk officer.',
+        meaning: 'Application processing has started.',
+        timestamp: '2026-07-10T09:15:00Z',
+        read: true,
+        actionRequired: false,
+        actionLabel: null,
+        targetFeature: 'application-status',
+      },
+    ],
     timeline: [
       {
         step: 1,
@@ -593,6 +677,34 @@ export const MOCK_PENSION_APPLICATIONS = [
         },
       ],
     },
+    notifications: [
+      {
+        id: 'NOTIF-4190-01',
+        applicationId: 'PEN-2026-4190',
+        type: NOTIFICATION_TYPES.INFO.id,
+        title: 'Medical Assessment Review in Progress',
+        message: 'Your certified 50% disability assessment certificate is undergoing verification by the district medical board.',
+        meaning: 'Medical board records are being checked. You do not need to do anything right now.',
+        timestamp: '2026-08-02T10:00:00Z',
+        read: false,
+        actionRequired: false,
+        actionLabel: null,
+        targetFeature: 'verification',
+      },
+      {
+        id: 'NOTIF-4190-02',
+        applicationId: 'PEN-2026-4190',
+        type: NOTIFICATION_TYPES.INFO.id,
+        title: 'Disability Pension Application Registered',
+        message: 'Your application has been received and assigned tracking ID PEN-2026-4190.',
+        meaning: 'Application submitted successfully.',
+        timestamp: '2026-08-01T14:20:00Z',
+        read: true,
+        actionRequired: false,
+        actionLabel: null,
+        targetFeature: 'application-status',
+      },
+    ],
     timeline: [
       {
         step: 1,
