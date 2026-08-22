@@ -1,7 +1,9 @@
 import { useAccessibility } from '../../features/accessibility/useAccessibility';
+import { useVoiceAssistant } from '../../features/voice-assistance/useVoiceAssistant';
 import './AccessibilitySetup.css';
 
 const AccessibilitySetup = () => {
+  
   const {
     fontSize,
     setFontSize,
@@ -11,9 +13,48 @@ const AccessibilitySetup = () => {
     setReducedMotion,
   } = useAccessibility();
 
+  const {
+  speak,
+  stop,
+  isSpeaking,
+  isSupported,
+} = useVoiceAssistant();
+
+const accessibilityContent = `
+  Accessibility Preferences.
+  Make the application comfortable for you.
+  Choose the settings that make reading and using this application easier.
+  Text size. Choose a text size that is comfortable for you to read.
+  High contrast. Increase the contrast between text, backgrounds, and controls.
+  Reduced motion. Reduce animations and motion effects throughout the application.
+`;
+
   return (
     <main className="accessibility-setup">
       <div className="accessibility-setup__container">
+        {isSupported && (
+  <div className="accessibility-setup__voice">
+    <button
+      type="button"
+      className="accessibility-setup__listen"
+      onClick={() => {
+        if (isSpeaking) {
+          stop();
+        } else {
+          speak(accessibilityContent);
+        }
+      }}
+      aria-pressed={isSpeaking}
+      aria-label={
+        isSpeaking
+          ? 'Stop reading accessibility instructions'
+          : 'Listen to accessibility instructions'
+      }
+    >
+      {isSpeaking ? 'Stop' : 'Listen'}
+    </button>
+  </div>
+)}
         <header className="accessibility-setup__header">
           <p className="accessibility-setup__eyebrow">
             Accessibility Preferences

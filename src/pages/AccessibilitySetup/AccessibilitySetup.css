@@ -143,3 +143,29 @@
     padding: 20px;
   }
 }
+.accessibility-setup__voice {
+  display: flex;
+  justify-content: flex-start;
+  margin-bottom: 24px;
+}
+
+.accessibility-setup__listen {
+  min-height: 48px;
+  padding: 12px 24px;
+  border: 2px solid #1f4f82;
+  border-radius: 8px;
+  background: #1f4f82;
+  color: #ffffff;
+  font-size: 1rem;
+  font-weight: 700;
+  cursor: pointer;
+}
+
+.accessibility-setup__listen:hover {
+  opacity: 0.9;
+}
+
+.accessibility-setup__listen:focus-visible {
+  outline: 3px solid #000000;
+  outline-offset: 3px;
+}
