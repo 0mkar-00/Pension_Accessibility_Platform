@@ -9,7 +9,6 @@ import './App.css';
 import { AuthProvider } from './context/AuthProvider';
 import { PensionProvider } from './context/PensionProvider';
 import { DocumentsPage } from './features/documents';
-import { useLanguage } from './features/regional-language/useLanguage';
 
 import Welcome from './pages/Welcome/Welcome';
 import AccessibilitySetup from './pages/AccessibilitySetup/AccessibilitySetup';
@@ -20,15 +19,15 @@ import FinalReview from './pages/FinalReview/FinalReview';
 import { VerificationPage } from './features/verification';
 import { ApplicationStatusPage } from './features/application-status';
 import { NotificationsPage } from './features/notifications';
+import { PensionHistoryPage } from './features/pension-history';
 
 
 
 
-const PensionHistoryPlaceholder = () => {
-  const { translate } = useLanguage();
-  return <h1>{translate('pensionHistory')}</h1>;
-};
-
+<Route
+  path="/pension-history"
+  element={<PensionHistoryPage />}
+/>
 const NotificationsRoute = () => {
   const navigate = useNavigate();
 
@@ -82,8 +81,8 @@ function App() {
             element={<NotificationsRoute />}
             />
             <Route
-              path="/pension-history"
-              element={<PensionHistoryPlaceholder />}
+            path="/pension-history"
+            element={<PensionHistoryPage />}
             />
           </Routes>
         </BrowserRouter>
