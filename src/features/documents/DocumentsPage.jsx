@@ -3,7 +3,7 @@
  * Main page for viewing, uploading, and managing pension scheme verification documents.
  * Integrates directly with AuthContext and PensionContext.
  */
-
+import { useLanguage } from '../../features/regional-language/useLanguage';
 import { useState, useMemo } from 'react';
 import { useAuth } from '../../context/useAuth.js';
 import { usePension } from '../../context/usePension.js';
@@ -11,6 +11,7 @@ import { DocumentCard } from './components/DocumentCard.jsx';
 import { DOCUMENT_STATUS, HELPER_PERMISSIONS, USER_ROLES } from '../../utils/constants.js';
 
 export const DocumentsPage = () => {
+  const { translate } = useLanguage();
   const { currentUser, isHelper, hasPermission } = useAuth();
   const {
     applications,
@@ -101,7 +102,7 @@ export const DocumentsPage = () => {
   return (
     <main className="documents-page-container" aria-labelledby="documents-page-heading">
       <header className="documents-page-header">
-        <h1 id="documents-page-heading">Application Documents</h1>
+        <h1 id="documents-page-heading">{translate('documents')}</h1>
         <p className="page-intro">
           Review, upload, and track verification documents required for your pension scheme.
         </p>

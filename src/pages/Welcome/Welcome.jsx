@@ -1,7 +1,11 @@
+import { useLanguage } from '../../features/regional-language/useLanguage';
+
 const Welcome = () => {
+  const { translate } = useLanguage();
+
   return (
     <div>
-      <h1>Welcome</h1>
+      <h1>{translate('welcome')}</h1>
     </div>
   );
 };
