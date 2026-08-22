@@ -1,4 +1,9 @@
-import { BrowserRouter, Routes, Route } from 'react-router-dom';
+import {
+  BrowserRouter,
+  Routes,
+  Route,
+  useNavigate,
+} from 'react-router-dom';
 import './App.css';
 
 import { AuthProvider } from './context/AuthProvider';
@@ -14,16 +19,40 @@ import Dashboard from './pages/Dashboard/Dashboard';
 import FinalReview from './pages/FinalReview/FinalReview';
 import { VerificationPage } from './features/verification';
 import { ApplicationStatusPage } from './features/application-status';
+import { NotificationsPage } from './features/notifications';
 
 
-const NotificationsPlaceholder = () => {
-  const { translate } = useLanguage();
-  return <h1>{translate('notifications')}</h1>;
-};
+
 
 const PensionHistoryPlaceholder = () => {
   const { translate } = useLanguage();
   return <h1>{translate('pensionHistory')}</h1>;
+};
+
+const NotificationsRoute = () => {
+  const navigate = useNavigate();
+
+  const handleNavigateFeature = (targetFeature) => {
+    const routes = {
+      documents: '/documents',
+      verification: '/verification',
+      applicationStatus: '/application-status',
+      pensionHistory: '/pension-history',
+      dashboard: '/dashboard',
+    };
+
+    const targetRoute = routes[targetFeature];
+
+    if (targetRoute) {
+      navigate(targetRoute);
+    }
+  };
+
+  return (
+    <NotificationsPage
+      onNavigateFeature={handleNavigateFeature}
+    />
+  );
 };
 
 function App() {
@@ -49,8 +78,8 @@ function App() {
             element={<ApplicationStatusPage />}
               />
             <Route
-              path="/notifications"
-              element={<NotificationsPlaceholder />}
+            path="/notifications"
+            element={<NotificationsRoute />}
             />
             <Route
               path="/pension-history"

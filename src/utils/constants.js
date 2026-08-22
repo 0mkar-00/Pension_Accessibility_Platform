@@ -154,3 +154,26 @@ export const VERIFICATION_STATUS_LABELS = {
   [VERIFICATION_STATUS.ACTION_REQUIRED]: 'Action Required from Applicant',
   [VERIFICATION_STATUS.REJECTED]: 'Verification Rejected',
 };
+
+export const NOTIFICATION_TYPES = {
+  ACTION_REQUIRED: {
+    id: 'ACTION_REQUIRED',
+    label: 'Action Needed',
+    icon: '⚠',
+  },
+  SUCCESS: {
+    id: 'SUCCESS',
+    label: 'Update / Approved',
+    icon: '✓',
+  },
+  INFO: {
+    id: 'INFO',
+    label: 'Information',
+    icon: 'ℹ️',
+  },
+  WARNING: {
+    id: 'WARNING',
+    label: 'Notice',
+    icon: '⚠️',
+  },
+};
