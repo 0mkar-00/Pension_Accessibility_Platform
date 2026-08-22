@@ -1,9 +1,25 @@
 import { useAccessibility } from '../../features/accessibility/useAccessibility';
 import { useVoiceAssistant } from '../../features/voice-assistance/useVoiceAssistant';
 import { useLanguage } from '../../features/regional-language/useLanguage';
+import { useTrustedHelper } from '../../features/trusted-helper/useTrustedHelper';
+import {
+  PERMISSIONS,
+  CONSENT_STATES,
+} from '../../features/trusted-helper/TrustedHelperContext';
 import './AccessibilitySetup.css';
 
 const AccessibilitySetup = () => {
+  const {
+  helperIdentity,
+  isEnabled,
+  consentState,
+  enableHelper,
+  disableHelper,
+  approve,
+  reject,
+  revoke,
+  hasPermission,
+} = useTrustedHelper();
   const {
     fontSize,
     setFontSize,
@@ -18,6 +34,7 @@ const AccessibilitySetup = () => {
     setLanguage,
     translate,
   } = useLanguage();
+
 
   const {
     speak,
@@ -116,6 +133,131 @@ const AccessibilitySetup = () => {
             </div>
           </fieldset>
         </section>
+        <section
+  className="accessibility-card"
+  aria-labelledby="trusted-helper-heading"
+>
+  <fieldset>
+    <legend id="trusted-helper-heading">
+      {translate('trustedHelper')}
+    </legend>
+
+    <p className="accessibility-card__description">
+      A trusted person can assist the senior citizen with permitted
+      pension and application information, while the senior citizen
+      remains in control.
+    </p>
+
+    {!isEnabled && (
+      <div>
+        <p>
+          <strong>Status: Not Enabled</strong>
+        </p>
+
+        <button
+          type="button"
+          onClick={enableHelper}
+          className="accessibility-setup__listen"
+        >
+          Enable Helper
+        </button>
+      </div>
+    )}
+
+    {isEnabled && helperIdentity && (
+      <>
+        <div>
+          <p>
+            <strong>Name:</strong> {helperIdentity.name}
+          </p>
+
+          <p>
+            <strong>Relationship:</strong> {helperIdentity.relationship}
+          </p>
+
+          <p>
+            <strong>Status:</strong>{' '}
+            {consentState === CONSENT_STATES.PENDING && 'Pending'}
+            {consentState === CONSENT_STATES.APPROVED && 'Approved'}
+            {consentState === CONSENT_STATES.REJECTED && 'Rejected'}
+            {consentState === CONSENT_STATES.REVOKED && 'Revoked'}
+          </p>
+        </div>
+
+        {consentState === CONSENT_STATES.PENDING && (
+          <div className="accessibility-options accessibility-options--two">
+            <button
+              type="button"
+              onClick={approve}
+              className="accessibility-setup__listen"
+            >
+              Approve
+            </button>
+
+            <button
+              type="button"
+              onClick={reject}
+              className="accessibility-setup__listen"
+            >
+              Reject
+            </button>
+          </div>
+        )}
+
+        {consentState === CONSENT_STATES.APPROVED && (
+          <div className="accessibility-options accessibility-options--two">
+            <button
+              type="button"
+              onClick={revoke}
+              className="accessibility-setup__listen"
+            >
+              Revoke
+            </button>
+
+            <button
+              type="button"
+              onClick={disableHelper}
+              className="accessibility-setup__listen"
+            >
+              Disable Helper
+            </button>
+          </div>
+        )}
+
+        <div>
+          <h2>Permissions</h2>
+
+          <ul>
+            <li>
+              {hasPermission(PERMISSIONS.VIEW_APPLICATION) ? '☑' : '☐'}
+              {' '}View Application
+            </li>
+
+            <li>
+              {hasPermission(PERMISSIONS.VIEW_STATUS) ? '☑' : '☐'}
+              {' '}View Application Status
+            </li>
+
+            <li>
+              {hasPermission(PERMISSIONS.VIEW_NOTIFICATIONS) ? '☑' : '☐'}
+              {' '}View Notifications
+            </li>
+
+            <li>
+              {hasPermission(PERMISSIONS.VIEW_PENSION_HISTORY) ? '☑' : '☐'}
+              {' '}View Pension History
+            </li>
+
+            <li>
+              {hasPermission(PERMISSIONS.ASSIST_DOCUMENTS) ? '☑' : '☐'}
+              {' '}Assist with Documents
+            </li>
+          </ul>
+        </div>
+      </>
+    )}
+  </fieldset>
+</section>
 
         {/* Voice Assistance */}
         {isSupported && (
