@@ -137,4 +137,20 @@ export const STORAGE_KEYS = {
   APPLICATIONS: 'pension_app_applications',
   PAYMENTS: 'pension_app_payments',
   USER_PREFERENCES: 'pension_app_preferences',
+  
+};
+export const VERIFICATION_STATUS = {
+  PENDING: 'PENDING',
+  IN_REVIEW: 'IN_REVIEW',
+  VERIFIED: 'VERIFIED',
+  ACTION_REQUIRED: 'ACTION_REQUIRED',
+  REJECTED: 'REJECTED',
+};
+
+export const VERIFICATION_STATUS_LABELS = {
+  [VERIFICATION_STATUS.PENDING]: 'Verification Pending',
+  [VERIFICATION_STATUS.IN_REVIEW]: 'Verification in Progress',
+  [VERIFICATION_STATUS.VERIFIED]: 'Fully Verified & Cleared',
+  [VERIFICATION_STATUS.ACTION_REQUIRED]: 'Action Required from Applicant',
+  [VERIFICATION_STATUS.REJECTED]: 'Verification Rejected',
 };

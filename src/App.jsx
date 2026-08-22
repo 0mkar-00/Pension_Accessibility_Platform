@@ -12,16 +12,9 @@ import Eligibility from './pages/Eligibility/Eligibility';
 import PersonalDetails from './pages/PersonalDetails/PersonalDetails';
 import Dashboard from './pages/Dashboard/Dashboard';
 import FinalReview from './pages/FinalReview/FinalReview';
+import { VerificationPage } from './features/verification';
+import { ApplicationStatusPage } from './features/application-status';
 
-const VerificationPlaceholder = () => {
-  const { translate } = useLanguage();
-  return <h1>{translate('verification')}</h1>;
-};
-
-const ApplicationStatusPlaceholder = () => {
-  const { translate } = useLanguage();
-  return <h1>{translate('applicationStatus')}</h1>;
-};
 
 const NotificationsPlaceholder = () => {
   const { translate } = useLanguage();
@@ -49,12 +42,12 @@ function App() {
             <Route path="/documents" element={<DocumentsPage />} />
             <Route
               path="/verification"
-              element={<VerificationPlaceholder />}
+              element={<VerificationPage />}
             />
             <Route
-              path="/application-status"
-              element={<ApplicationStatusPlaceholder />}
-            />
+            path="/application-status"
+            element={<ApplicationStatusPage />}
+              />
             <Route
               path="/notifications"
               element={<NotificationsPlaceholder />}
