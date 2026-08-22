@@ -1,6 +1,7 @@
 /**
  * Pension Service
- * Handles CRUD operations, state persistence, application tracking, document uploads, and payment history.
+ * Handles CRUD operations, state persistence, application tracking, document uploads,
+ * verification workflows, and payment history.
  * Simulates async backend API with client-side storage fallback.
  */
 
@@ -15,6 +16,8 @@ import {
   HELPER_PERMISSIONS,
   DOCUMENT_STATUS,
   DOCUMENT_TYPES,
+  VERIFICATION_STATUS,
+  VERIFICATION_CHECK_CATEGORIES,
 } from '../utils/constants.js';
 import { validatePensionApplication } from '../utils/validators.js';
 
@@ -27,12 +30,13 @@ class PensionService {
 
   initData() {
     const existingApps = storageService.getItem(STORAGE_KEYS.APPLICATIONS);
-    // If empty or missing documents array in mock apps, reseed with full dataset
+    // If empty or missing documents / verification array in mock apps, reseed
     if (
       !existingApps ||
       !Array.isArray(existingApps) ||
       existingApps.length === 0 ||
-      !existingApps[0]?.documents
+      !existingApps[0]?.documents ||
+      !existingApps[0]?.verification
     ) {
       storageService.setItem(STORAGE_KEYS.APPLICATIONS, MOCK_PENSION_APPLICATIONS);
     }
@@ -195,6 +199,72 @@ class PensionService {
       });
     }
 
+    const initialVerification = {
+      id: `VER-2026-${randomSuffix}`,
+      applicationId: newId,
+      overallStatus: VERIFICATION_STATUS.PENDING,
+      initiatedAt: new Date().toISOString(),
+      lastUpdatedAt: new Date().toISOString(),
+      completedAt: null,
+      assignedOfficer: 'District Social Security Verification Cell',
+      remarks: 'Application submitted. Verification docket queued for initial scrutiny.',
+      nextAction: 'Upload all required verification documents on the Documents page.',
+      checks: [
+        {
+          id: `CHK-${randomSuffix}-01`,
+          name: VERIFICATION_CHECK_CATEGORIES.IDENTITY.title,
+          purpose: VERIFICATION_CHECK_CATEGORIES.IDENTITY.description,
+          status: VERIFICATION_STATUS.PENDING,
+          remarks: 'Awaiting initial desk officer review.',
+          reviewer: null,
+          timestamp: null,
+          nextAction: 'Ensure demo photo identity card is uploaded.',
+        },
+        {
+          id: `CHK-${randomSuffix}-02`,
+          name: VERIFICATION_CHECK_CATEGORIES.DOCUMENT_SCRUTINY.title,
+          purpose: VERIFICATION_CHECK_CATEGORIES.DOCUMENT_SCRUTINY.description,
+          status: VERIFICATION_STATUS.PENDING,
+          remarks: 'Awaiting mandatory document uploads.',
+          reviewer: null,
+          timestamp: null,
+          nextAction: 'Submit all mandatory scheme certificates.',
+        },
+        {
+          id: `CHK-${randomSuffix}-03`,
+          name: VERIFICATION_CHECK_CATEGORIES.ELIGIBILITY.title,
+          purpose: VERIFICATION_CHECK_CATEGORIES.ELIGIBILITY.description,
+          status: VERIFICATION_STATUS.PENDING,
+          remarks: 'Awaiting scrutiny before field verification scheduling.',
+          reviewer: null,
+          timestamp: null,
+          nextAction: null,
+        },
+        {
+          id: `CHK-${randomSuffix}-04`,
+          name: VERIFICATION_CHECK_CATEGORIES.BANK_DBT.title,
+          purpose: VERIFICATION_CHECK_CATEGORIES.BANK_DBT.description,
+          status: VERIFICATION_STATUS.PENDING,
+          remarks: 'Bank passbook verification pending.',
+          reviewer: null,
+          timestamp: null,
+          nextAction: 'Submit bank passbook copy.',
+        },
+      ],
+      timeline: [
+        {
+          id: `VTL-${randomSuffix}-01`,
+          title: 'Verification Docket Opened',
+          status: VERIFICATION_STATUS.PENDING,
+          timestamp: new Date().toISOString(),
+          remarks: 'Verification process initiated following online application submission.',
+          reviewer: isHelperSubmission
+            ? `${currentUser.fullName} (Trusted Helper)`
+            : 'Online Submission Portal',
+        },
+      ],
+    };
+
     const newApplication = {
       id: newId,
       trackingNumber: newId,
@@ -225,6 +295,7 @@ class PensionService {
           : HELPER_PERMISSIONS.VIEW_ONLY.id,
       },
       documents: initialDocuments,
+      verification: initialVerification,
       timeline: [
         {
           step: 1,
@@ -287,10 +358,6 @@ class PensionService {
 
   /**
    * Mock upload / re-upload a document for an application
-   * @param {string} applicationId
-   * @param {string} documentId
-   * @param {{ fileName: string, fileSize: string }} fileMetadata
-   * @param {Object} currentUser
    */
   async uploadDocument(applicationId, documentId, fileMetadata, currentUser = null) {
     await delay(250);
@@ -323,11 +390,33 @@ class PensionService {
       fileSize: fileMetadata.fileSize || '1.0 MB',
       uploadedAt: new Date().toISOString(),
       uploadedBy: uploaderLabel,
-      reviewRemarks: null, // clear previous rejection remark on re-upload
+      reviewRemarks: null,
     };
 
     app.documents = documents;
     app.lastUpdatedDate = new Date().toISOString();
+
+    // If verification was ACTION_REQUIRED due to this document, transition to IN_REVIEW
+    if (app.verification && app.verification.overallStatus === VERIFICATION_STATUS.ACTION_REQUIRED) {
+      app.verification = {
+        ...app.verification,
+        overallStatus: VERIFICATION_STATUS.IN_REVIEW,
+        lastUpdatedAt: new Date().toISOString(),
+        remarks: 'Re-uploaded document received. Verification scrutiny resumed.',
+        nextAction: 'Awaiting officer review of re-uploaded document.',
+        timeline: [
+          ...(app.verification.timeline || []),
+          {
+            id: `VTL-REUP-${Date.now()}`,
+            title: `Document Re-uploaded: ${documents[docIndex].name}`,
+            status: VERIFICATION_STATUS.IN_REVIEW,
+            timestamp: new Date().toISOString(),
+            remarks: `Re-uploaded by ${uploaderLabel}. Queued for desk review.`,
+            reviewer: uploaderLabel,
+          },
+        ],
+      };
+    }
 
     apps[appIndex] = app;
     storageService.setItem(STORAGE_KEYS.APPLICATIONS, apps);
@@ -335,7 +424,7 @@ class PensionService {
   }
 
   /**
-   * Update review status of a document (e.g. Approved / Rejected by officer)
+   * Update review status of a document
    */
   async updateDocumentReview(applicationId, documentId, newStatus, reviewRemarks = null) {
     await delay(200);
@@ -368,6 +457,159 @@ class PensionService {
     apps[appIndex] = app;
     storageService.setItem(STORAGE_KEYS.APPLICATIONS, apps);
     return documents[docIndex];
+  }
+
+  /**
+   * Get verification profile for an application
+   */
+  async getVerification(applicationId) {
+    await delay(150);
+    const app = await this.getApplicationById(applicationId);
+    return app ? app.verification || null : null;
+  }
+
+  /**
+   * Update an individual verification check status
+   * @param {string} applicationId
+   * @param {string} checkId
+   * @param {string} status (VERIFICATION_STATUS)
+   * @param {string} remarks
+   * @param {string|null} nextAction
+   * @param {Object} currentUser
+   */
+  async updateVerificationCheckStatus(
+    applicationId,
+    checkId,
+    status,
+    remarks = '',
+    nextAction = null,
+    currentUser = null
+  ) {
+    await delay(250);
+
+    const apps = storageService.getItem(STORAGE_KEYS.APPLICATIONS, MOCK_PENSION_APPLICATIONS);
+    const appIndex = apps.findIndex((a) => a.id === applicationId);
+
+    if (appIndex === -1) {
+      throw new Error(`Application ${applicationId} not found.`);
+    }
+
+    const app = { ...apps[appIndex] };
+    if (!app.verification || !Array.isArray(app.verification.checks)) {
+      throw new Error(`No verification records found for application ${applicationId}.`);
+    }
+
+    const checks = [...app.verification.checks];
+    const checkIndex = checks.findIndex((c) => c.id === checkId);
+
+    if (checkIndex === -1) {
+      throw new Error(`Verification check ${checkId} not found.`);
+    }
+
+    const reviewerName = currentUser
+      ? `${currentUser.fullName} (${currentUser.designation || 'Verification Officer'})`
+      : 'Verification Officer (Social Welfare Dept)';
+
+    checks[checkIndex] = {
+      ...checks[checkIndex],
+      status,
+      remarks: remarks || checks[checkIndex].remarks,
+      reviewer: reviewerName,
+      timestamp: new Date().toISOString(),
+      nextAction: nextAction !== undefined ? nextAction : checks[checkIndex].nextAction,
+    };
+
+    // Recalculate overall verification status based on checks
+    let calculatedOverallStatus = VERIFICATION_STATUS.IN_REVIEW;
+    const allVerified = checks.every((c) => c.status === VERIFICATION_STATUS.VERIFIED);
+    const hasRejected = checks.some((c) => c.status === VERIFICATION_STATUS.REJECTED);
+    const hasActionRequired = checks.some((c) => c.status === VERIFICATION_STATUS.ACTION_REQUIRED);
+    const allPending = checks.every((c) => c.status === VERIFICATION_STATUS.PENDING);
+
+    if (hasRejected) {
+      calculatedOverallStatus = VERIFICATION_STATUS.REJECTED;
+    } else if (hasActionRequired) {
+      calculatedOverallStatus = VERIFICATION_STATUS.ACTION_REQUIRED;
+    } else if (allVerified) {
+      calculatedOverallStatus = VERIFICATION_STATUS.VERIFIED;
+    } else if (allPending) {
+      calculatedOverallStatus = VERIFICATION_STATUS.PENDING;
+    }
+
+    const timelineEvent = {
+      id: `VTL-CHK-${Date.now()}`,
+      title: `${checks[checkIndex].name}: ${status}`,
+      status,
+      timestamp: new Date().toISOString(),
+      remarks: remarks || `Verification status updated to ${status}.`,
+      reviewer: reviewerName,
+    };
+
+    app.verification = {
+      ...app.verification,
+      checks,
+      overallStatus: calculatedOverallStatus,
+      lastUpdatedAt: new Date().toISOString(),
+      completedAt: allVerified ? new Date().toISOString() : null,
+      remarks:
+        calculatedOverallStatus === VERIFICATION_STATUS.VERIFIED
+          ? 'All verification checks completed and verified successfully.'
+          : remarks || app.verification.remarks,
+      nextAction: nextAction !== undefined ? nextAction : app.verification.nextAction,
+      timeline: [...(app.verification.timeline || []), timelineEvent],
+    };
+
+    app.lastUpdatedDate = new Date().toISOString();
+    apps[appIndex] = app;
+    storageService.setItem(STORAGE_KEYS.APPLICATIONS, apps);
+    return app.verification;
+  }
+
+  /**
+   * Update overall verification status directly
+   */
+  async updateOverallVerification(applicationId, status, remarks = '', nextAction = null, currentUser = null) {
+    await delay(250);
+
+    const apps = storageService.getItem(STORAGE_KEYS.APPLICATIONS, MOCK_PENSION_APPLICATIONS);
+    const appIndex = apps.findIndex((a) => a.id === applicationId);
+
+    if (appIndex === -1) {
+      throw new Error(`Application ${applicationId} not found.`);
+    }
+
+    const app = { ...apps[appIndex] };
+    if (!app.verification) {
+      throw new Error(`No verification records found for application ${applicationId}.`);
+    }
+
+    const reviewerName = currentUser
+      ? `${currentUser.fullName} (${currentUser.designation || 'Verification Officer'})`
+      : 'Verification Officer';
+
+    const timelineEvent = {
+      id: `VTL-OVR-${Date.now()}`,
+      title: `Overall Status Updated: ${status}`,
+      status,
+      timestamp: new Date().toISOString(),
+      remarks: remarks || `Overall verification status set to ${status}.`,
+      reviewer: reviewerName,
+    };
+
+    app.verification = {
+      ...app.verification,
+      overallStatus: status,
+      remarks: remarks || app.verification.remarks,
+      nextAction: nextAction !== undefined ? nextAction : app.verification.nextAction,
+      lastUpdatedAt: new Date().toISOString(),
+      completedAt: status === VERIFICATION_STATUS.VERIFIED ? new Date().toISOString() : null,
+      timeline: [...(app.verification.timeline || []), timelineEvent],
+    };
+
+    app.lastUpdatedDate = new Date().toISOString();
+    apps[appIndex] = app;
+    storageService.setItem(STORAGE_KEYS.APPLICATIONS, apps);
+    return app.verification;
   }
 
   /**
