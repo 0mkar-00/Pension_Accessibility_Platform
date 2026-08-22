@@ -47,6 +47,61 @@ export const APPLICATION_STATUS_LABELS = {
   [APPLICATION_STATUS.DISBURSED]: 'First Disbursement Released',
 };
 
+export const DOCUMENT_STATUS = {
+  NOT_SUBMITTED: 'NOT_SUBMITTED',
+  UPLOADED: 'UPLOADED',
+  UNDER_REVIEW: 'UNDER_REVIEW',
+  APPROVED: 'APPROVED',
+  REJECTED: 'REJECTED',
+};
+
+export const DOCUMENT_STATUS_LABELS = {
+  [DOCUMENT_STATUS.NOT_SUBMITTED]: 'Not Submitted',
+  [DOCUMENT_STATUS.UPLOADED]: 'Uploaded (Pending Scrutiny)',
+  [DOCUMENT_STATUS.UNDER_REVIEW]: 'Under Review',
+  [DOCUMENT_STATUS.APPROVED]: 'Verified & Approved',
+  [DOCUMENT_STATUS.REJECTED]: 'Rejected (Action Required)',
+};
+
+export const DOCUMENT_TYPES = {
+  AGE_PROOF: {
+    id: 'DOC_AGE_PROOF',
+    name: 'Proof of Age',
+    description: 'Birth Certificate, School Leaving Certificate, or Voter ID for age verification.',
+    mandatory: true,
+  },
+  IDENTITY_PROOF: {
+    id: 'DOC_IDENTITY_PROOF',
+    name: 'Identity Verification Proof',
+    description: 'Government-issued photo identification card (Demo copy).',
+    mandatory: true,
+  },
+  INCOME_CERTIFICATE: {
+    id: 'DOC_INCOME_CERT',
+    name: 'Income Certificate / BPL Card',
+    description: 'Annual income certificate issued by Revenue Authority or BPL ration card.',
+    mandatory: true,
+  },
+  BANK_PASSBOOK: {
+    id: 'DOC_BANK_PASSBOOK',
+    name: 'Bank Passbook Front Page',
+    description: 'Bank passbook copy or cancelled cheque showing account number and IFSC for DBT.',
+    mandatory: true,
+  },
+  DISABILITY_CERTIFICATE: {
+    id: 'DOC_DISABILITY_CERT',
+    name: 'Disability Medical Assessment Certificate',
+    description: 'Certificate from competent medical board showing 40% or higher disability.',
+    mandatory: false,
+  },
+  DEATH_CERTIFICATE: {
+    id: 'DOC_DEATH_CERT',
+    name: 'Spouse Death Certificate',
+    description: 'Official death certificate of deceased spouse (required for Widow Pension Scheme).',
+    mandatory: false,
+  },
+};
+
 export const USER_ROLES = {
   PENSIONER: 'PENSIONER',
   TRUSTED_HELPER: 'TRUSTED_HELPER',

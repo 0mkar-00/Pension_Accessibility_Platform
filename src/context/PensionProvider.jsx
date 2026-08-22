@@ -1,6 +1,6 @@
 /**
  * Pension Provider
- * Manages global pension application state, active tracking status, and payment history.
+ * Manages global pension application state, active tracking status, document uploads, and payment history.
  */
 
 import { useState, useEffect, useCallback } from 'react';
@@ -60,6 +60,9 @@ export const PensionProvider = ({ children }) => {
         if (isMounted) {
           setApplications(apps);
           setPayments(paymentData);
+          if (apps.length > 0) {
+            setActiveApplication((prev) => prev || apps[0]);
+          }
           setError(null);
         }
       } catch (err) {
@@ -98,6 +101,10 @@ export const PensionProvider = ({ children }) => {
     }
   };
 
+  const selectApplication = (app) => {
+    setActiveApplication(app);
+  };
+
   const submitApplication = async (formData) => {
     try {
       setIsLoading(true);
@@ -115,6 +122,84 @@ export const PensionProvider = ({ children }) => {
     }
   };
 
+  const uploadDocument = async (applicationId, documentId, fileMetadata) => {
+    try {
+      setIsLoading(true);
+      setError(null);
+      const updatedDoc = await pensionService.uploadDocument(
+        applicationId,
+        documentId,
+        fileMetadata,
+        currentUser
+      );
+
+      setApplications((prev) =>
+        prev.map((app) => {
+          if (app.id !== applicationId) return app;
+          const docs = (app.documents || []).map((d) =>
+            d.id === documentId ? updatedDoc : d
+          );
+          return { ...app, documents: docs, lastUpdatedDate: new Date().toISOString() };
+        })
+      );
+
+      setActiveApplication((prev) => {
+        if (!prev || prev.id !== applicationId) return prev;
+        const docs = (prev.documents || []).map((d) =>
+          d.id === documentId ? updatedDoc : d
+        );
+        return { ...prev, documents: docs, lastUpdatedDate: new Date().toISOString() };
+      });
+
+      return updatedDoc;
+    } catch (err) {
+      console.error('PensionProvider: Upload error', err);
+      setError(err.message || 'Failed to upload document.');
+      throw err;
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
+  const updateDocumentReview = async (applicationId, documentId, newStatus, reviewRemarks = null) => {
+    try {
+      setIsLoading(true);
+      setError(null);
+      const updatedDoc = await pensionService.updateDocumentReview(
+        applicationId,
+        documentId,
+        newStatus,
+        reviewRemarks
+      );
+
+      setApplications((prev) =>
+        prev.map((app) => {
+          if (app.id !== applicationId) return app;
+          const docs = (app.documents || []).map((d) =>
+            d.id === documentId ? updatedDoc : d
+          );
+          return { ...app, documents: docs, lastUpdatedDate: new Date().toISOString() };
+        })
+      );
+
+      setActiveApplication((prev) => {
+        if (!prev || prev.id !== applicationId) return prev;
+        const docs = (prev.documents || []).map((d) =>
+          d.id === documentId ? updatedDoc : d
+        );
+        return { ...prev, documents: docs, lastUpdatedDate: new Date().toISOString() };
+      });
+
+      return updatedDoc;
+    } catch (err) {
+      console.error('PensionProvider: Document review error', err);
+      setError(err.message || 'Failed to update document review status.');
+      throw err;
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
   const updateStatus = async (applicationId, newStatus, note = '') => {
     try {
       setIsLoading(true);
@@ -123,9 +208,12 @@ export const PensionProvider = ({ children }) => {
       setApplications((prev) =>
         prev.map((app) => (app.id === applicationId ? updated : app))
       );
-      if (activeApplication?.id === applicationId) {
-        setActiveApplication(updated);
-      }
+      setActiveApplication((prev) => {
+        if (prev?.id === applicationId) {
+          return updated;
+        }
+        return prev;
+      });
       return updated;
     } catch (err) {
       console.error('PensionProvider: Update status error', err);
@@ -149,8 +237,11 @@ export const PensionProvider = ({ children }) => {
     error,
     fetchApplications,
     fetchPayments,
+    selectApplication,
     trackApplication,
     submitApplication,
+    uploadDocument,
+    updateDocumentReview,
     updateStatus,
     clearActiveApplication,
   };
