@@ -1,6 +1,10 @@
 import { BrowserRouter, Routes, Route } from 'react-router-dom';
 import './App.css';
 
+import { AuthProvider } from './context/AuthProvider';
+import { PensionProvider } from './context/PensionProvider';
+import { DocumentsPage } from './features/documents';
+
 import Welcome from './pages/Welcome/Welcome';
 import AccessibilitySetup from './pages/AccessibilitySetup/AccessibilitySetup';
 import Eligibility from './pages/Eligibility/Eligibility';
@@ -8,7 +12,6 @@ import PersonalDetails from './pages/PersonalDetails/PersonalDetails';
 import Dashboard from './pages/Dashboard/Dashboard';
 import FinalReview from './pages/FinalReview/FinalReview';
 
-const DocumentsPlaceholder = () => <h1>Documents</h1>;
 const VerificationPlaceholder = () => <h1>Verification</h1>;
 const ApplicationStatusPlaceholder = () => <h1>Application Status</h1>;
 const NotificationsPlaceholder = () => <h1>Notifications</h1>;
@@ -16,7 +19,9 @@ const PensionHistoryPlaceholder = () => <h1>Pension History</h1>;
 
 function App() {
   return (
-    <BrowserRouter>
+    <AuthProvider>
+      <PensionProvider>
+        <BrowserRouter>
       <Routes>
         {/* Developer 1 routes */}
         <Route path="/" element={<Welcome />} />
@@ -27,7 +32,7 @@ function App() {
         <Route path="/final-review" element={<FinalReview />} />
 
         {/* Developer 3 routes - temporary placeholders */}
-        <Route path="/documents" element={<DocumentsPlaceholder />} />
+        <Route path="/documents" element={<DocumentsPage />} />
         <Route path="/verification" element={<VerificationPlaceholder />} />
         <Route
           path="/application-status"
@@ -36,7 +41,9 @@ function App() {
         <Route path="/notifications" element={<NotificationsPlaceholder />} />
         <Route path="/pension-history" element={<PensionHistoryPlaceholder />} />
       </Routes>
-    </BrowserRouter>
+        </BrowserRouter>
+      </PensionProvider>
+    </AuthProvider>
   );
 }
 
