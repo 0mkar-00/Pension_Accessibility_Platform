@@ -1,0 +1,145 @@
+.accessibility-setup {
+  min-height: 100vh;
+  padding: 40px 20px;
+  background: #f5f7fa;
+}
+
+.accessibility-setup__container {
+  width: min(900px, 100%);
+  margin: 0 auto;
+}
+
+.accessibility-setup__header {
+  margin-bottom: 32px;
+}
+
+.accessibility-setup__eyebrow {
+  margin: 0 0 8px;
+  font-size: 0.95rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+}
+
+.accessibility-setup__header h1 {
+  margin: 0 0 16px;
+  font-size: 2.2rem;
+  line-height: 1.2;
+}
+
+.accessibility-setup__header p {
+  max-width: 700px;
+  margin: 0;
+  font-size: 1.1rem;
+  line-height: 1.6;
+}
+
+.accessibility-card {
+  margin-bottom: 24px;
+  padding: 28px;
+  background: #ffffff;
+  border: 1px solid #d5dbe3;
+  border-radius: 12px;
+}
+
+.accessibility-card fieldset {
+  margin: 0;
+  padding: 0;
+  border: 0;
+}
+
+.accessibility-card legend {
+  padding: 0;
+  font-size: 1.35rem;
+  font-weight: 700;
+}
+
+.accessibility-card__description {
+  margin: 8px 0 20px;
+  line-height: 1.5;
+}
+
+.accessibility-options {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 16px;
+}
+
+.accessibility-options--two {
+  grid-template-columns: repeat(2, 1fr);
+}
+
+.accessibility-option {
+  display: flex;
+  align-items: flex-start;
+  gap: 14px;
+  min-height: 72px;
+  padding: 18px;
+  border: 2px solid #9aa4b2;
+  border-radius: 10px;
+  cursor: pointer;
+  background: #ffffff;
+}
+
+.accessibility-option:hover {
+  border-color: #315f91;
+}
+
+.accessibility-option--selected {
+  border-color: #1f4f82;
+  background: #eef5fc;
+}
+
+.accessibility-option input {
+  width: 22px;
+  height: 22px;
+  margin-top: 2px;
+  flex-shrink: 0;
+}
+
+.accessibility-option input:focus-visible {
+  outline: 3px solid #1f4f82;
+  outline-offset: 3px;
+}
+
+.accessibility-option span {
+  display: flex;
+  flex-direction: column;
+  gap: 5px;
+}
+
+.accessibility-option strong {
+  font-size: 1.05rem;
+}
+
+.accessibility-option small {
+  font-size: 0.95rem;
+  line-height: 1.4;
+}
+
+.accessibility-setup__notice {
+  padding: 16px 18px;
+  border-radius: 8px;
+  background: #eaf4ea;
+  border: 1px solid #9bc39b;
+  font-weight: 600;
+}
+
+@media (max-width: 700px) {
+  .accessibility-setup {
+    padding: 24px 16px;
+  }
+
+  .accessibility-setup__header h1 {
+    font-size: 1.8rem;
+  }
+
+  .accessibility-options,
+  .accessibility-options--two {
+    grid-template-columns: 1fr;
+  }
+
+  .accessibility-card {
+    padding: 20px;
+  }
+}
